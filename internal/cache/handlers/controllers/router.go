@@ -14,8 +14,8 @@ func NewRouter(controller ports.ICacheController) {
 	redisGroup := baseGroup.PathPrefix("/redis").Subrouter()
 	redisGroup.Path("/test").Methods("POST").HandlerFunc(controller.Test)
 	redisGroup.Path("/").Methods("POST").HandlerFunc(controller.Save)
-	redisGroup.Path("/").Methods("GET").Queries("name", "{name}").HandlerFunc(controller.Get)
-	redisGroup.Path("/").Methods("DELETE").Queries("name", "{name}").HandlerFunc(controller.Delete)
+	redisGroup.Path("/").Methods("GET").Queries("key", "{key}").HandlerFunc(controller.Get)
+	redisGroup.Path("/").Methods("DELETE").Queries("key", "{key}").HandlerFunc(controller.Delete)
 
 	http.Handle("/", router)
 }

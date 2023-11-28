@@ -38,7 +38,7 @@ func (rc redisController) Save(w http.ResponseWriter, r *http.Request) {
 
 func (rc redisController) Delete(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodDelete {
-		key := r.URL.Query().Get("name")
+		key := r.URL.Query().Get("key")
 
 		if key == "" {
 			panic("Null exception")
@@ -57,13 +57,13 @@ func (rc redisController) Delete(w http.ResponseWriter, r *http.Request) {
 
 func (rc redisController) Get(w http.ResponseWriter, r *http.Request) {
 	if r.Method == http.MethodGet {
-		q := r.URL.Query()
+		q := r.URL.Query().Get("key")
 
-		if q.Get("name") == "" {
+		if q == "" {
 			panic("Null exception")
 		}
 
-		cacheModel := rc.redisService.Get(r.Context(), q.Get("name"))
+		cacheModel := rc.redisService.Get(r.Context(), q)
 
 		w.WriteHeader(200)
 		w.Header().Set("Content-Type", "application/json")
@@ -84,13 +84,13 @@ func (rc redisController) Test(w http.ResponseWriter, r *http.Request) {
 
 		s := []byte(model.Value)
 
-		rc.redisService.Save(r.Context(), models.CacheModel{Key: model.Key, Data: s})
+		rc.redisService.Save(r.Context(), models.CacheModel{Key: model.Key, Value: s})
 
 		cacheModel := rc.redisService.Get(r.Context(), model.Key)
 
 		responseModel := Test{Key: cacheModel.Key}
 
-		responseModel.Value = string(cacheModel.Data)
+		responseModel.Value = string(cacheModel.Value)
 
 		w.WriteHeader(201)
 		json.NewEncoder(w).Encode(responseModel)

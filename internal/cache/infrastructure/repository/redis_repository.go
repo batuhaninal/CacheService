@@ -17,7 +17,7 @@ func NewRedisRepository(client *redis.Client) ports.ICacheRepository {
 }
 
 func (rr redisRepository) CreateOrUpdate(ctx context.Context, model models.CacheModel) {
-	err := rr.client.Set(ctx, model.Key, model.Data, time.Hour*10).Err()
+	err := rr.client.Set(ctx, model.Key, model.Value, time.Hour*10).Err()
 	if err != nil {
 		panic(err.Error())
 	}
@@ -28,11 +28,17 @@ func (rr redisRepository) Remove(ctx context.Context, key string) {
 }
 
 func (rr redisRepository) Get(ctx context.Context, key string) models.CacheModel {
-	value, err := rr.client.Get(ctx, key).Bytes()
+	value := rr.client.Get(ctx, key)
 
-	if err != nil {
-		panic(err.Error())
+	/*if value.Err() != nil {
+		panic(value.Err())
+	}*/
+
+	data, _ := value.Bytes()
+
+	if len(data) > 0 {
+		return models.CacheModel{Key: key, Value: data}
 	}
 
-	return models.CacheModel{Key: key, Data: value}
+	return models.CacheModel{}
 }
