@@ -22,9 +22,9 @@ func main() {
 
 	redisService := services.NewRedisService(redisRepo)
 
-	a := controllers.NewRedisController(redisService)
+	redisController := controllers.NewRedisController(redisService)
 
-	http.HandleFunc("/test", a.Test)
+	controllers.NewRouter(redisController)
 
 	http.ListenAndServe(":7001", nil)
 }
